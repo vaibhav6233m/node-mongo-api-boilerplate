@@ -3,4 +3,4 @@ module.exports = {
   invalidDetails: '01',
   dbCode: '02',
   sessionExpire: '03'
-}
+};

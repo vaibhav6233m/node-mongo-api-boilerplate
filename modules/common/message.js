@@ -25,4 +25,4 @@ module.exports = {
   allFieldReq: 'Please fill all required fields',
   noData: 'No information available',
   csvDataAdded: 'CSV data added successfully'
-}
+};

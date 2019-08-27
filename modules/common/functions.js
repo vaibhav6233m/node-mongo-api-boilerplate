@@ -1,9 +1,10 @@
 // const con = require('../database/mysql')
-const config = require('../../config');
 const CryptoJS = require('crypto-js');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 const randomstring = require('randomstring');
+const config = require('../../config');
+
 const status = config.env;
 
 /**
@@ -14,11 +15,10 @@ const status = config.env;
 function encryptData(data) {
   if (status === 'development') {
     return { encResponse: data };
-  } else {
-    var dataString = JSON.stringify(data);
-    var response = CryptoJS.AES.encrypt(dataString, config.cryptokey);
-    return { encResponse: response.toString() };
   }
+  const dataString = JSON.stringify(data);
+  const response = CryptoJS.AES.encrypt(dataString, config.cryptokey);
+  return { encResponse: response.toString() };
 }
 
 /**
@@ -29,15 +29,13 @@ function encryptData(data) {
 function decryptData(data) {
   if (status === 'development') {
     return data;
-  } else {
-    var decrypted = CryptoJS.AES.decrypt(data, config.cryptokey);
-    if (decrypted) {
-      var userinfo = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
-      return userinfo;
-    } else {
-      return { userinfo: { error: 'Please send proper token' } };
-    }
   }
+  const decrypted = CryptoJS.AES.decrypt(data, config.cryptokey);
+  if (decrypted) {
+    const userinfo = JSON.parse(decrypted.toString(CryptoJS.enc.Utf8));
+    return userinfo;
+  }
+  return { userinfo: { error: 'Please send proper token' } };
 }
 
 /**
@@ -46,7 +44,7 @@ function decryptData(data) {
  * @param {*} return (encrypted data)
  */
 function encryptPassword(data) {
-  var response = CryptoJS.AES.encrypt(data, config.tokenkey);
+  const response = CryptoJS.AES.encrypt(data, config.tokenkey);
   return response.toString();
 }
 
@@ -56,13 +54,12 @@ function encryptPassword(data) {
  * @param {*} return (decrypt data)
  */
 function decryptPassword(data) {
-  var decrypted = CryptoJS.AES.decrypt(data, config.tokenkey);
+  const decrypted = CryptoJS.AES.decrypt(data, config.tokenkey);
   if (decrypted) {
-    var userinfo = decrypted.toString(CryptoJS.enc.Utf8);
+    const userinfo = decrypted.toString(CryptoJS.enc.Utf8);
     return userinfo;
-  } else {
-    return { userinfo: { error: 'Please send proper token' } };
   }
+  return { userinfo: { error: 'Please send proper token' } };
 }
 
 /**
@@ -71,7 +68,7 @@ function decryptPassword(data) {
  * @param {*} return (encrypted data)
  */
 async function tokenEncrypt(data) {
-  var token = await jwt.sign({ data: data }, config.tokenkey, { expiresIn: 24 * 60 * 60 }); // Expires in 1 Day
+  const token = await jwt.sign({ data }, config.tokenkey, { expiresIn: 24 * 60 * 60 }); // Expires in 1 Day
   return token;
 }
 
@@ -95,8 +92,8 @@ async function tokenDecrypt(data) {
  * @param {*} return (encrypted data)
  */
 function responseGenerator(code, message, data = '') {
-  var details = {
-    status: { code: code, message: message },
+  const details = {
+    status: { code, message },
     result: data
   };
 
@@ -104,9 +101,8 @@ function responseGenerator(code, message, data = '') {
 
   if (status === 'development') {
     return details;
-  } else {
-    return encryptData(details);
   }
+  return encryptData(details);
 }
 
 /**
@@ -115,7 +111,7 @@ function responseGenerator(code, message, data = '') {
  * @param {*} return (decrypted data)
  */
 async function sendEmail(to, subject, message) {
-  var transporter = nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: config.SMTPemailAddress,
@@ -123,10 +119,10 @@ async function sendEmail(to, subject, message) {
     }
   });
 
-  var mailOptions = {
+  const mailOptions = {
     from: 'developers.nodemongo@gmail.com',
-    to: to,
-    subject: subject,
+    to,
+    subject,
     html: message
   };
 
@@ -144,7 +140,7 @@ async function sendEmail(to, subject, message) {
  * return (err, result)
  */
 function generateRandomString(callback) {
-  var referralCode = randomstring.generate({
+  const referralCode = randomstring.generate({
     length: 9,
     charset: 'alphanumeric',
     capitalization: 'uppercase'

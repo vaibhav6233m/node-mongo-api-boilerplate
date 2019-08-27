@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const Country = require('../schema/country')
+const mongoose = require('mongoose');
+const Country = require('../schema/country');
 
 const userSchema = mongoose.Schema(
   {
@@ -17,10 +17,10 @@ const userSchema = mongoose.Schema(
       validate: {
         validator: text => {
           if (text !== null && text.length > 0) {
-            const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-            return re.test(text)
+            const re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+            return re.test(text);
           }
-          return false
+          return false;
         },
         message: 'Invalid email address'
       }
@@ -51,8 +51,8 @@ const userSchema = mongoose.Schema(
     }
   },
   { timestamps: true, collection: 'user' }
-)
+);
 
-const User = mongoose.model('User', userSchema)
+const User = mongoose.model('User', userSchema);
 
-module.exports = User
+module.exports = User;

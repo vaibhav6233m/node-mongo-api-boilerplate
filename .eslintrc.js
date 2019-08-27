@@ -5,7 +5,7 @@ module.exports = {
     node: true
   },
   // extends: ["eslint:recommended"],
-  extends: ['eslint:recommended', 'prettier'],
+  extends: ['airbnb-base', 'prettier'],
   plugins: ['prettier'],
   globals: {
     Atomics: 'readonly',
@@ -15,8 +15,9 @@ module.exports = {
     ecmaVersion: 2018
   },
   rules: {
-    'no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: false }]
-    // 'prettier/prettier': ['error'],
+    'prettier/prettier': ['error'],
+    'no-unused-vars': ['warn', { vars: 'all', args: 'after-used', ignoreRestSiblings: false }],
+    'no-console': 0
     // indent: ['error', 'tab'],
     // 'linebreak-style': ['error', 'unix'],
     // quotes: ['error', 'single'],

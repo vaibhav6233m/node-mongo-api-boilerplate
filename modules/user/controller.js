@@ -2,7 +2,7 @@ const userObject = require('./user');
 const functions = require('../common/functions');
 
 const userController = {
-  //User Registration API
+  // User Registration API
   registration: async (req, res) => {
     try {
       const registrationDetails = await userObject
@@ -20,7 +20,7 @@ const userController = {
     }
   },
 
-  //Verify Email API
+  // Verify Email API
   verifyEmail: async (req, res) => {
     try {
       const verificationDetails = await userObject
@@ -38,7 +38,7 @@ const userController = {
     }
   },
 
-  //Login API
+  // Login API
   login: async (req, res) => {
     try {
       const loginDetails = await userObject.userService().login(res.locals.requestedData);

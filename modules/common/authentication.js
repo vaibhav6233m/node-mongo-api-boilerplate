@@ -1,6 +1,6 @@
-const functions = require("./functions");
-const code = require("./code");
-const message = require("./message");
+const functions = require('./functions');
+const code = require('./code');
+const message = require('./message');
 
 const authenticationController = {
   validateToken: async (req, res, next) => {
@@ -11,7 +11,7 @@ const authenticationController = {
         if (tokenDecryptInfo.data) {
           res.locals.tokenInfo = tokenDecryptInfo.data;
           const token = await functions.tokenEncrypt(tokenDecryptInfo.data);
-          res.header("auth", token);
+          res.header('auth', token);
           next();
         } else {
           res.send(functions.responseGenerator(code.sessionExpire, message.sessionExpire));

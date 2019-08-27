@@ -1,12 +1,13 @@
 const util = require('util');
+const validator = require('validator');
+const fs = require('fs');
 const functions = require('../common/functions');
 const config = require('../../config');
-const validator = require('validator');
 const code = require('../common/code');
 const message = require('../common/message');
-const fs = require('fs');
 
 const User = require('../database/schema/user');
+
 class UserService {
   /**
    * API for user registration
@@ -16,7 +17,7 @@ class UserService {
   async registration(info) {
     try {
       if (validator.isEmail(info.data.emailAddress)) {
-        let exist = await User.findOne({ emailAddress: info.data.emailAddress });
+        const exist = await User.findOne({ emailAddress: info.data.emailAddress });
 
         if (exist) {
           console.log('User exists');
@@ -73,20 +74,19 @@ class UserService {
         console.log('TCL: UserService -> verifyEmail -> tokenDecrypt', tokenDecrypt);
         if (tokenDecrypt.message === 'jwt expired') {
           return { code: code.sessionExpire, message: message.emailLinkExpired };
-        } else {
-          try {
-            const verifyEmailDetails = await User.updateOne(
-              { emailAddress: tokenDecrypt.data },
-              { isEmailVerified: 1 }
-            );
-            return {
-              code: code.success,
-              message: message.emailVerificationSuccess,
-              data: verifyEmailDetails
-            };
-          } catch (error) {
-            return { code: code.dbCode, message: message.dbError, data: error };
-          }
+        }
+        try {
+          const verifyEmailDetails = await User.updateOne(
+            { emailAddress: tokenDecrypt.data },
+            { isEmailVerified: 1 }
+          );
+          return {
+            code: code.success,
+            message: message.emailVerificationSuccess,
+            data: verifyEmailDetails
+          };
+        } catch (error) {
+          return { code: code.dbCode, message: message.dbError, data: error };
         }
       } catch (e) {
         return { code: code.invalidDetails, message: message.tryCatch, data: e };
@@ -116,15 +116,12 @@ class UserService {
                 const token = await functions.tokenEncrypt(userDetails);
                 userDetails.set('token', token);
                 return { code: code.success, message: message.success, data: userDetails, token };
-              } else {
-                return { code: code.invalidDetails, message: message.emailVerify };
               }
-            } else {
-              return { code: code.invalidDetails, message: message.accountDisable };
+              return { code: code.invalidDetails, message: message.emailVerify };
             }
-          } else {
-            return { code: code.invalidDetails, message: message.invalidLoginDetails };
+            return { code: code.invalidDetails, message: message.accountDisable };
           }
+          return { code: code.invalidDetails, message: message.invalidLoginDetails };
         }
       } else {
         return { code: code.invalidDetails, message: message.invalidLoginDetails, data: [] };
@@ -223,19 +220,17 @@ class UserService {
         const emailAddress = Buffer.from(info.data.emailAddress, 'hex').toString('ascii');
         const emailAddressDetails = await functions.tokenDecrypt(emailAddress);
         if (emailAddressDetails.data) {
-          //Encrypt password for the user
+          // Encrypt password for the user
           const password = functions.encryptPassword(info.data.newPassword);
           const passwordDetails = await User.updateOne(
             { emailAddress: emailAddressDetails.data },
             { userPassword: password }
           );
           return { code: code.success, message: message.passwordReset, data: passwordDetails };
-        } else {
-          return { code: code.invalidDetails, message: message.emailLinkExpired, data: null };
         }
-      } else {
-        return { code: code.invalidDetails, message: message.invalidEmail };
+        return { code: code.invalidDetails, message: message.emailLinkExpired, data: null };
       }
+      return { code: code.invalidDetails, message: message.invalidEmail };
     } catch (e) {
       return { code: code.invalidDetails, message: message.tryCatch, data: e };
     }
@@ -256,9 +251,8 @@ class UserService {
       ) {
         const userDetail = await User.updateOne({ _id: userInfo._id }, info.data);
         return { code: code.success, message: message.profileUpdate, data: userDetail };
-      } else {
-        return { code: code.invalidDetails, message: message.allFieldReq };
       }
+      return { code: code.invalidDetails, message: message.allFieldReq };
     } catch (error) {
       return { code: code.dbCode, message: message.dbError, data: error };
     }
@@ -277,9 +271,8 @@ class UserService {
       if (userInformation) {
         userInformation.userPassword = null;
         return { code: code.success, message: message.success, data: userInformation };
-      } else {
-        return { code: code.invalidDetails, message: message.noData };
       }
+      return { code: code.invalidDetails, message: message.noData };
     } catch (error) {
       return { code: code.dbCode, message: message.dbError, data: error };
     }
@@ -293,7 +286,7 @@ class UserService {
   async uploadProfilePicUsingBase64Data(id, info) {
     try {
       const base64Data = info.data.profilePic.replace(/^data:image\/png;base64,/, '');
-      const path = 'upload/profilepic/' + id + '-' + Date.now() + '.png';
+      const path = `upload/profilepic/${id}-${Date.now()}.png`;
       try {
         const fs = require('fs');
         const writeFile = util.promisify(fs.writeFile).bind(fs);
@@ -313,7 +306,7 @@ class UserService {
 }
 
 module.exports = {
-  userService: function() {
+  userService() {
     return new UserService();
   }
 };
